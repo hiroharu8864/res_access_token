@@ -24,7 +24,7 @@ export default function VerifyToken() {
     setResult(null);
 
     try {
-      const response = await fetch('http://localhost:3001/verify_token', {
+      const response = await fetch('/api/verify_token', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token.trim()}`

@@ -43,7 +43,7 @@ export default function AccessToken() {
       const timestamp = Date.now();
       console.log('Making request with timestamp:', timestamp);
       
-      const response = await fetch(`http://localhost:3001/access_token?t=${timestamp}`, {
+      const response = await fetch(`/api/access_token?t=${timestamp}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -276,7 +276,7 @@ export default function AccessToken() {
               border: '1px solid #404040'
             }}>
 {`curl -H "Authorization: Bearer ${token.access_token}" \\
-     http://localhost:3001/verify_token`}
+     /api/verify_token`}
             </pre>
           </div>
         </div>
