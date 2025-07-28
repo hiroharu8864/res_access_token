@@ -54,8 +54,8 @@ export default function AccessToken() {
           'Cache-Control': 'no-cache',
         },
         body: JSON.stringify({
-          username: 'admin',
-          password: 'password'
+          username: import.meta.env.VITE_DEMO_USERNAME || 'admin',
+          password: import.meta.env.VITE_DEMO_PASSWORD || 'password'
         }),
       });
 

@@ -5,7 +5,9 @@ import { randomBytes } from 'crypto';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'demo-development-secret-key-change-in-production';
+const DEMO_USERNAME = process.env.DEMO_USERNAME || 'admin';
+const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'password';
 
 app.use(cors());
 app.use(express.json());
@@ -22,6 +24,17 @@ interface TokenPayload {
 
 app.post('/access_token', (req, res) => {
   try {
+    // 本番環境でのセキュリティチェック
+    if (process.env.NODE_ENV === 'production' && 
+        (JWT_SECRET === 'demo-development-secret-key-change-in-production' ||
+         DEMO_USERNAME === 'admin' || 
+         DEMO_PASSWORD === 'password')) {
+      console.error('Production environment detected with default values');
+      return res.status(500).json({
+        error: 'Server configuration error: Please set secure environment variables'
+      });
+    }
+
     const { username, password } = req.body;
     
     if (!username || !password) {
@@ -30,7 +43,7 @@ app.post('/access_token', (req, res) => {
       });
     }
 
-    if (username === 'admin' && password === 'password') {
+    if (username === DEMO_USERNAME && password === DEMO_PASSWORD) {
       const jti = randomBytes(16).toString('hex');
       const nonce = randomBytes(8).toString('hex');
       

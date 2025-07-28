@@ -1,5 +1,16 @@
 # JWT認証サービス (res_access_token)
 
+## ⚠️ 重要: デモ・学習目的専用アプリケーション
+
+**このアプリケーションはJWT認証の仕組みを学習・デモンストレーションする目的で作成されています。本番環境での使用は想定されていません。**
+
+## 🛡️ セキュリティ警告
+
+- **デモ用途のみ**: このコードは教育・学習目的で作成されています
+- **本番利用禁止**: セキュリティ要件を満たしていないため、本番環境では使用しないでください
+- **認証の簡易実装**: 実際のユーザー認証システムではありません
+- **環境変数必須**: すべての機密情報は環境変数で管理してください
+
 JWT形式のアクセストークンを疑似的に発行・検証するWebアプリケーションです。React + TypeScript (フロントエンド) と Node.js + Express (バックエンド) で構築されており、Vercelでのデプロイに対応しています。
 
 ## 🚀 機能
@@ -57,12 +68,27 @@ npm install
 yarn install
 ```
 
-### 環境変数 (オプション)
+### 環境変数設定 (必須)
+
+**⚠️ 重要: 環境変数の設定は必須です**
+
 ```bash
-# .env ファイルを作成 (オプション)
-JWT_SECRET=your-custom-secret-key
+# .env ファイルを .env.example からコピーして作成
+cp .env.example .env
+
+# .env ファイルを編集して以下の値を設定
+JWT_SECRET=your-very-secure-secret-key-here
+DEMO_USERNAME=your_demo_username
+DEMO_PASSWORD=your_demo_password
+VITE_DEMO_USERNAME=your_demo_username
+VITE_DEMO_PASSWORD=your_demo_password
 PORT=3001
 ```
+
+**注意事項:**
+- `JWT_SECRET`: 強固でランダムな文字列を設定してください
+- `DEMO_USERNAME/DEMO_PASSWORD`: デモ用の認証情報を設定してください
+- `VITE_*`: フロントエンド用の環境変数です（Viteアプリで使用）
 
 ### 開発環境での実行
 
@@ -109,7 +135,17 @@ vercel
 
 ### 環境変数設定 (Vercel)
 Vercelダッシュボードで以下の環境変数を設定してください：
+
+**必須環境変数:**
 - `JWT_SECRET`: JWTトークンの署名用秘密鍵
+- `DEMO_USERNAME`: デモ用ユーザー名
+- `DEMO_PASSWORD`: デモ用パスワード
+- `VITE_DEMO_USERNAME`: フロントエンド用ユーザー名
+- `VITE_DEMO_PASSWORD`: フロントエンド用パスワード
+
+**⚠️ セキュリティ注意事項:**
+- すべての値に強固でランダムな文字列を使用してください
+- デフォルト値や推測しやすい値は避けてください
 
 ## 📖 API仕様
 
@@ -119,8 +155,8 @@ Vercelダッシュボードで以下の環境変数を設定してください�
 **リクエスト:**
 ```json
 {
-  "username": "admin",
-  "password": "password"
+  "username": "設定した DEMO_USERNAME の値",
+  "password": "設定した DEMO_PASSWORD の値"
 }
 ```
 
@@ -148,8 +184,8 @@ Authorization: Bearer <access_token>
   "valid": true,
   "payload": {
     "userId": "12345",
-    "username": "admin",
-    "email": "admin@example.com",
+    "username": "設定したユーザー名",
+    "email": "設定したユーザー名@example.com",
     "jti": "unique-jwt-id",
     "nonce": "random-nonce",
     "iat": 1234567890,
@@ -217,15 +253,30 @@ res_access_token/
 
 ## 🔒 セキュリティ注意事項
 
-⚠️ **この実装はデモ目的です。本番環境では以下の対策が必要です：**
+⚠️ **この実装はデモ・学習目的です。本番環境では絶対に使用しないでください。**
 
-- 強固なJWT_SECRETの設定
-- ユーザー認証システムの実装
-- レート制限の実装
-- HTTPS通信の強制
-- 適切なCORSポリシーの設定
-- トークンのリフレッシュ機能
-- セキュリティヘッダーの設定
+### 現在の制限事項
+- **固定認証**: 環境変数で設定された固定の認証情報のみ対応
+- **簡易JWT実装**: 最小限のJWT機能のみ実装
+- **セキュリティ不備**: 本番レベルのセキュリティ対策は未実装
+
+### 本番環境で必要な追加対策
+- **データベース連携**: 実際のユーザー管理システム
+- **パスワードハッシュ化**: bcryptなどによる暗号化
+- **レート制限**: API呼び出し制限
+- **HTTPS強制**: SSL/TLS通信の強制
+- **適切なCORS**: 必要最小限のオリジン許可
+- **トークン管理**: リフレッシュトークン、無効化機能
+- **監査ログ**: アクセスログとセキュリティ監視
+- **セキュリティヘッダー**: CSP、HSTS等の実装
+- **入力検証**: SQLインジェクション、XSS対策
+- **環境分離**: 開発・ステージング・本番環境の分離
+
+### 推奨使用場面
+- JWT認証の学習
+- プロトタイプ開発
+- 技術デモンストレーション
+- 教育目的
 
 ## 📝 ライセンス
 

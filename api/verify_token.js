@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'demo-development-secret-key-change-in-production';
 
 export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,6 +16,15 @@ export default function handler(req, res) {
   }
 
   try {
+    // 本番環境でのセキュリティチェック
+    if (process.env.NODE_ENV === 'production' && 
+        JWT_SECRET === 'demo-development-secret-key-change-in-production') {
+      console.error('Production environment detected with default JWT_SECRET');
+      return res.status(500).json({
+        error: 'Server configuration error: Please set secure JWT_SECRET'
+      });
+    }
+
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
