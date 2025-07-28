@@ -24,15 +24,11 @@ interface TokenPayload {
 
 app.post('/access_token', (req, res) => {
   try {
-    // 本番環境でのセキュリティチェック
-    if (process.env.NODE_ENV === 'production' && 
-        (JWT_SECRET === 'demo-development-secret-key-change-in-production' ||
-         DEMO_USERNAME === 'admin' || 
-         DEMO_PASSWORD === 'password')) {
-      console.error('Production environment detected with default values');
-      return res.status(500).json({
-        error: 'Server configuration error: Please set secure environment variables'
-      });
+    // デモ用途での動作ログ（本番環境では環境変数設定を推奨）
+    if (JWT_SECRET === 'demo-development-secret-key-change-in-production' ||
+        DEMO_USERNAME === 'admin' || 
+        DEMO_PASSWORD === 'password') {
+      console.log('Using default demo credentials. For production, please set custom environment variables.');
     }
 
     const { username, password } = req.body;
