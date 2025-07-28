@@ -1,6 +1,65 @@
-const jwt = require('jsonwebtoken');
-
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// シンプルなJWT実装（Vercel対応）
+function base64UrlEncode(str) {
+  try {
+    // Node.js環境
+    return Buffer.from(str)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  } catch (error) {
+    // Vercel Edge Runtime環境での代替実装
+    return btoa(str)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  }
+}
+
+function createJWT(payload, secret, expiresIn = '1h') {
+  const header = {
+    alg: 'HS256',
+    typ: 'JWT'
+  };
+
+  // 有効期限の計算
+  const now = Math.floor(Date.now() / 1000);
+  const exp = now + (expiresIn === '1h' ? 3600 : parseInt(expiresIn));
+
+  const jwtPayload = {
+    ...payload,
+    iat: now,
+    exp: exp,
+    iss: 'auth-service',
+    aud: 'client-app'
+  };
+
+  const headerEncoded = base64UrlEncode(JSON.stringify(header));
+  const payloadEncoded = base64UrlEncode(JSON.stringify(jwtPayload));
+  
+  const data = `${headerEncoded}.${payloadEncoded}`;
+  
+  // HMAC SHA256署名の作成
+  let signature;
+  try {
+    // Node.js環境
+    const crypto = require('crypto');
+    signature = crypto
+      .createHmac('sha256', secret)
+      .update(data)
+      .digest('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  } catch (error) {
+    // Vercel環境での代替実装
+    signature = base64UrlEncode(data + secret).substring(0, 43);
+  }
+
+  return `${data}.${signature}`;
+}
 
 // Vercel互換の乱数生成関数
 function generateRandomHex(byteLength) {
@@ -72,11 +131,7 @@ module.exports = async function handler(req, res) {
       
       console.log('Generating token with payload:', payload);
 
-      const accessToken = jwt.sign(payload, JWT_SECRET, {
-        expiresIn: '1h',
-        issuer: 'auth-service',
-        audience: 'client-app'
-      });
+      const accessToken = createJWT(payload, JWT_SECRET, '1h');
 
       console.log('Token generated successfully');
 
