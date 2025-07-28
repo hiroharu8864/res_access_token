@@ -1,7 +1,25 @@
 const jwt = require('jsonwebtoken');
-const { randomBytes } = require('crypto');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// Vercel互換の乱数生成関数
+function generateRandomHex(byteLength) {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    // Web標準のcrypto API (Vercel Edge Runtime対応)
+    const array = new Uint8Array(byteLength);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  } else {
+    // Node.js環境用フォールバック
+    try {
+      const { randomBytes } = require('crypto');
+      return randomBytes(byteLength).toString('hex');
+    } catch (error) {
+      // 最終フォールバック
+      return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+  }
+}
 
 module.exports = async function handler(req, res) {
   // CORS設定
@@ -41,8 +59,8 @@ module.exports = async function handler(req, res) {
     console.log('Credentials received:', { username, password: '***' });
 
     if (username === 'admin' && password === 'password') {
-      const jti = randomBytes(16).toString('hex');
-      const nonce = randomBytes(8).toString('hex');
+      const jti = generateRandomHex(16);
+      const nonce = generateRandomHex(8);
       
       const payload = {
         userId: '12345',
