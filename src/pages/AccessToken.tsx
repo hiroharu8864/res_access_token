@@ -43,7 +43,11 @@ export default function AccessToken() {
       const timestamp = Date.now();
       console.log('Making request with timestamp:', timestamp);
       
-      const response = await fetch(`/api/access_token?t=${timestamp}`, {
+      const apiUrl = process.env.NODE_ENV === 'development' 
+        ? `http://localhost:3001/access_token?t=${timestamp}`
+        : `/api/access_token?t=${timestamp}`;
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
