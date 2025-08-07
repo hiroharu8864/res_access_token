@@ -7,7 +7,9 @@
       "Bash(mkdir:*)",
       "Bash(move:*)",
       "Bash(mv:*)",
-      "Bash(rmdir:*)"
+      "Bash(rmdir:*)",
+      "Bash(npm install)",
+      "Bash(lsof:*)"
     ],
     "deny": []
   }
